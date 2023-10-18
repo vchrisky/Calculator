@@ -1,6 +1,9 @@
 *{
     box-sizing: border-box;
-    font-size: 20px;
+    text-align: center;
+}
+body{
+    background-color: burlywood;
 }
 #calculator-container{
     display: flex;
@@ -33,6 +36,7 @@
 }
 
 button{
+    font-size: 20px;
     background-color: gray;
     flex-grow: 1;
     width: 40px;
@@ -45,6 +49,7 @@ button:active{
 }
 
 input{
+    font-size: 20px;
     text-align: end;
     border-style: groove;
     flex-grow: 1;

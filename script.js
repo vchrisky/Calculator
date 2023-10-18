@@ -1,17 +1,17 @@
 function add(a, b) {
-    return (a + b).toFixed(3);
+    return a + b;
 }
 
 function subtract(a, b) {
-    return (a - b).toFixed(3);
+    return a - b;
 }
 
 function multiply(a, b) {
-    return (a * b).toFixed(3);
+    return a * b;
 }
 
 function divide(a, b) {
-    return (a / b).toFixed(3);
+    return (a / b).toFixed(2);
 }
 
 // console.log(subtract(25,6));
@@ -39,11 +39,11 @@ calc.classList.add("calculator");
 calcCtn.appendChild(calc);
 
 let displayDiv = document.createElement("div");
-let btnsDiv = document.createElement("div");
+let btnDiv = document.createElement("div");
 displayDiv.classList.add("display-div");
-btnsDiv.classList.add("buttons-div");
+btnDiv.classList.add("buttons-div");
 calc.appendChild(displayDiv);
-calc.appendChild(btnsDiv);
+calc.appendChild(btnDiv);
 
 let display = document.createElement('input');
 display.id = 'main-input';
@@ -55,7 +55,7 @@ let num = 1;
 for (let i = 0; i < 6; i++) {
     btnChildDiv = document.createElement('div');
     btnChildDiv.classList.add(`button-div-${num}`);
-    btnsDiv.appendChild(btnChildDiv);
+    btnDiv.appendChild(btnChildDiv);
     let btnNum = 1;
     if (num > 1 && num < 6) {
         for (let i = 0; i < 4; i++) {
@@ -129,41 +129,43 @@ btnDiv6.appendChild(equalsBtn);
 
 
 split = display.value.split(operator);
+error = false;
+
+function clearError() {
+    if(error){
+        error = false;
+        display.value = "";
+    }
+}
+
+function mathSymbol(symbol){
+    clearError();
+    display.value += symbol;
+    if (split.length > 1) {
+        display.value = `${operate(operator, +number1, +number2)}${symbol}`;
+    }    
+    operator = symbol;
+}
 
 addBtn.addEventListener('click', () => {
-    display.value += "+";
-    if (split.length > 1) {
-        display.value = `${operate(operator, +number1, +number2)}+`;
-    }    
-    operator = `+`;
+    mathSymbol("+");
 })
 
 subtractBtn.addEventListener('click', () => {
-    display.value += "−";
-    if (split.length > 1) {
-        display.value = `${operate(operator, +number1, +number2)}−`;
-    }
-    operator = '−';
+    mathSymbol("−");
 })
 
 multiplyBtn.addEventListener('click', () => {
-    display.value += "×";
-    if (split.length > 1) {
-        display.value = `${operate(operator, +number1, +number2)}×`;
-    }    
-    operator = '×';
+    mathSymbol("×");
 })
 
 divideBtn.addEventListener('click', () => {
-    display.value += "÷";
-    if (split.length > 1) {
-        display.value = `${operate(operator, +number1, +number2)}÷`;
-    }
-    operator = '÷';
+    mathSymbol("÷");
 })
 
-function displayValues(value) {
-    display.value += value;
+function displayValues(digit) {
+    clearError();
+    display.value += digit;
     split = display.value.split(operator);
     number1 = split[0];
     number2 = split[1];
@@ -220,10 +222,23 @@ undoBtn.addEventListener('click', () => {
 })
 
 pointBtn.addEventListener('click', () => {
+    clearError();
     display.value += ".";
 })
 
 equalsBtn.addEventListener('click', () => {
+    if(display.value.includes(operator && number2)){
     display.value = "";
     display.value = operate(operator, +number1, +number2);
+    }else{
+        error = true;
+        display.value = "Please Input a valid Expression";
+    }
+})
+
+powerBtn.addEventListener('click', () => {
+    display.value += "²";
+    if (number1 > 0) {
+        display.value = Math.pow(number1, 2);   
+    }
 })
