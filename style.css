@@ -13,7 +13,7 @@ body{
 .calculator{
     width: 300px;
     height: 500px;
-    border: 2.5px solid firebrick;
+    border: 3px solid firebrick;
     border-radius: 5px;
     display: flex;
     flex-direction: column;
@@ -68,5 +68,9 @@ input{
 .equals-button{
     flex-grow: 2;
     width: 80px;
+    background-color: chocolate;
 }
 
+.equals-button:active{
+    background-color: transparent;
+}

@@ -11,13 +11,12 @@ function multiply(a, b) {
 }
 
 function divide(a, b) {
-    return (a / b).toFixed(2);
+    return (a / b).toFixed(3);
 }
 
-// console.log(subtract(25,6));
 
-let number1;
 let operator;
+let number1;
 let number2;
 
 function operate(operator, number1, number2) {
@@ -100,8 +99,8 @@ let digitBtn0 = document.querySelector('.button-div-5 .button-2');
 digitBtn0.textContent = "0";
 let pointBtn = document.querySelector('.button-div-5 .button-1');
 pointBtn.textContent = ".";
-let percentBtn1 = document.querySelector('.button-div-5 .button-3');
-percentBtn1.textContent = "%";
+let percentBtn = document.querySelector('.button-div-5 .button-3');
+percentBtn.textContent = "%";
 
 
 let addBtn = document.querySelector('.button-div-2 .button-4');
@@ -238,7 +237,20 @@ equalsBtn.addEventListener('click', () => {
 
 powerBtn.addEventListener('click', () => {
     display.value += "²";
-    if (number1 > 0) {
-        display.value = Math.pow(number1, 2);   
+    if (display.value.includes(number1)) {
+        display.value = number1 * number1;   
     }
+})
+
+percentBtn.addEventListener('click', () => {
+    display.value += "%";
+    if(number1){
+        display.value = number1 / 100;
+    }
+})
+
+sqRootBtn.addEventListener('click', () => {
+    display.value += "√";
+    display.value = Math.sqrt(number1).toFixed(3);
+    
 })
