@@ -1,17 +1,21 @@
+function roundOff2(num){
+    return Math.round(num * 100) / 100;
+}
+
 function add(a, b) {
-    return a + b;
+    return roundOff2((a + b));
 }
 
 function subtract(a, b) {
-    return a - b;
+    return roundOff2((a - b));
 }
 
 function multiply(a, b) {
-    return a * b;
+    return roundOff2((a * b));
 }
 
 function divide(a, b) {
-    return (a / b).toFixed(3);
+    return roundOff2((a / b));
 }
 
 
@@ -39,15 +43,18 @@ calcCtn.appendChild(calc);
 
 let displayDiv = document.createElement("div");
 let btnDiv = document.createElement("div");
-displayDiv.classList.add("display-div");
+displayDiv.classList.add("display1-div");
 btnDiv.classList.add("buttons-div");
 calc.appendChild(displayDiv);
 calc.appendChild(btnDiv);
 
-let display = document.createElement('input');
-display.id = 'main-input';
-displayDiv.appendChild(display);
-display.focus();
+let display1 = document.createElement('input');
+let display2 = document.createElement('span');
+display1.id = 'main-input';
+display2.id = 'secondary-display';
+displayDiv.appendChild(display2);
+displayDiv.appendChild(display1);
+display1.focus();
 
 let num = 1;
 
@@ -127,21 +134,39 @@ btnDiv6.appendChild(sqRootBtn);
 btnDiv6.appendChild(equalsBtn);
 
 
-split = display.value.split(operator);
+split = display1.value.split(operator);
 error = false;
 
 function clearError() {
     if(error){
         error = false;
-        display.value = "";
+        display1.value = "";
     }
 }
 
 function mathSymbol(symbol){
     clearError();
-    display.value += symbol;
+    display1.value += symbol;
+    display2.textContent += symbol;
+    if (display1.value.includes("√")) {
+        clearError();
+        console.log(split);
+        if (split.length > 1) {
+            splitOne = split[1].split("√");
+            splitValue = split.pop();
+            number2 = `${Math.sqrt(splitOne[1]).toFixed(3)}`;
+            display1.value = roundOff2(operate(operator, +number1, +number2)) + symbol;
+            operator = symbol;
+        }else if (split.length === 1){
+            operator = symbol;
+            splitOne = split[0].split("√");
+            display1.value = `${roundOff2((Math.sqrt(splitOne[1])))}${operator}`;
+        }        
+    }
+    console.log(split);
     if (split.length > 1) {
-        display.value = `${operate(operator, +number1, +number2)}${symbol}`;
+        console.log(split);
+        display1.value = `${operate(operator, +number1, +number2)}${symbol}`;
     }    
     operator = symbol;
 }
@@ -162,10 +187,12 @@ divideBtn.addEventListener('click', () => {
     mathSymbol("÷");
 })
 
+
 function displayValues(digit) {
     clearError();
-    display.value += digit;
-    split = display.value.split(operator);
+    display1.value += digit;
+    display2.textContent += digit;
+    split = display1.value.split(operator);
     number1 = split[0];
     number2 = split[1];
 }
@@ -211,46 +238,140 @@ digitBtn0.addEventListener('click', () => {
 })
 
 clearBtn.addEventListener('click', () => {
-    display.value = "";
+    display1.value = "";
+    display2.textContent = "";
     number1 = 0;
     number2 = 0;
 })
 
 undoBtn.addEventListener('click', () => {
-    display.value = display.value.split("").slice(0, -1).join("");
+    display1.value = display1.value.split("").slice(0, -1).join("");
+    display2.textContent = display2.textContent.split("").slice(0, -1).join("");
 })
 
 pointBtn.addEventListener('click', () => {
     clearError();
-    display.value += ".";
+    if(!display1.value.includes(".")){
+        display1.value += ".";
+        display2.textContent += ".";
+    }//else if(operator){
+    //     display1.value += ".";
+    //     display2.textContent += ".";
+    // }
 })
 
 equalsBtn.addEventListener('click', () => {
-    if(display.value.includes(operator && number2)){
-    display.value = "";
-    display.value = operate(operator, +number1, +number2);
-    }else{
-        error = true;
-        display.value = "Please Input a valid Expression";
+    console.log(display1.value.split(operator));
+    splitValue = display1.value.split(operator);
+    if (display1.value.includes("√")) {
+        clearError();
+        if (split.length > 1) {
+            split2 = split[1];
+            splitOne = split[1].split("√");
+            split.pop();
+            number2 = roundOff2(Math.sqrt(splitOne[1]));
+            display1.value = operate(operator, +split, +number2);
+            split.push(split2);
+        }else if (split.length === 1){
+            splitOne = split[0].split("√");
+            display1.value = roundOff2(Math.sqrt(splitOne[1]));
+        }        
     }
-})
 
-powerBtn.addEventListener('click', () => {
-    display.value += "²";
-    if (display.value.includes(number1)) {
-        display.value = number1 * number1;   
-    }
-})
+    if(display1.value.includes(operator && number2)){
+        display1.value = "";
+        display1.value = operate(operator, +number1, +number2);
+        display2.textContent = operate(operator, +number1, +number2);
+    }//else{
+        //     error = true;
+        //     display1.value = "Please Input a valid Expression";
+        //     display2.textContent = "";
+        // }
+    })
 
 percentBtn.addEventListener('click', () => {
-    display.value += "%";
-    if(number1){
-        display.value = number1 / 100;
+    clearError();
+    display2.textContent += "%";
+    console.log(split);
+    if (number1 && number2) {
+        split2 = split[1];
+        split.pop();
+        console.log(split);
+        number2 = `${number2 / 100}`;
+        display1.value = split + operator + number2;
+        split.push(split2);
+    }else if (number1){
+        console.log(split);
+        display1.value = `${number1 / 100}`;
+    }    
+})
+    
+powerBtn.addEventListener('click', () => {
+    clearError();
+    display2.textContent += "²";
+    console.log(split);
+    if (number1 && number2) {
+        split2 = split[1];
+        split.pop();
+        console.log(split);
+        number2 = `${number2 * number2}`;
+        display1.value = split + operator + number2;
+        split.push(split2);
+    }else if (number1){
+        console.log(split);
+        display1.value = `${number1 * number1}`;
     }
 })
 
+
 sqRootBtn.addEventListener('click', () => {
-    display.value += "√";
-    display.value = Math.sqrt(number1).toFixed(3);
-    
+    display1.value += "√";
+    display2.textContent += "√";
+    // display1.value = Math.sqrt(number1).toFixed(3);
 })
+
+document.addEventListener("keydown", function(e){
+   if(e.key === "1"){
+     digitBtn1.click();
+   }else if(e.key === "2"){
+    digitBtn2.click();
+   }else if(e.key === "3"){
+    digitBtn3.click();
+   }else if(e.key === "4"){
+    digitBtn4.click();
+   }else if(e.key === "5"){
+    digitBtn5.click();
+   }else if(e.key === "6"){
+    digitBtn6.click();
+   }else if(e.key === "7"){
+    digitBtn7.click();
+   }else if(e.key === "8"){
+    digitBtn8.click();
+   }else if(e.key === "9"){
+    digitBtn9.click();
+   }else if(e.key === "0"){
+    digitBtn0.click();
+   }else if(e.key === "+"){
+    addBtn.click();
+   }else if(e.key === "-"){
+    subtractBtn.click();
+   }else if(e.key === "*"){
+    multiplyBtn.click();
+   }else if(e.key === "/"){
+    divideBtn.click();
+   }else if(e.key === "."){
+    pointBtn.click();
+   }else if(e.key === "%"){
+    percentBtn.click();
+   }else if(e.key === "Backspace"){
+    undoBtn.click();
+   }else if(e.key === "Enter"){
+    equalsBtn.click();
+   }
+});
+
+let num21 = 512123.32;
+
+const roundedNum = Math.round(num21 * 100) / 100;
+
+console.log(roundedNum);
