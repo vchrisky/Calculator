@@ -30,7 +30,11 @@ function operate(operator, number1, number2) {
   } else if (operator === "×") {
     return multiply(number1, number2);
   } else if (operator === "÷") {
-    return divide(number1, number2);
+    if (number2 == 0) {
+      return "To Infinity... and Beyond!";
+    } else {
+      return divide(number1, number2);
+    }
   }
 }
 
@@ -131,18 +135,16 @@ btnDiv6.appendChild(sqRootBtn);
 btnDiv6.appendChild(equalsBtn);
 
 function splitExp(string) {
-  const regex = /([−|+|-]?\d+(\.\d+)?)([-−+×÷])([−|+|-]?\d+(\.\d+)?)/;
+  sqRootBtn.textContent = "√";
+  const regex = /([−|+|-]?\d+(\.\d+)?)([-−+×÷])([−|+|-|√]?\d+(\.\d+)?)/;
   let matches = string.split(regex);
   let [, num1, , symbol, num2] = matches;
-  console.log(matches.length > 1 && matches[0] !== "");
   if (matches.length > 1 && matches[0] !== "") {
     console.log("error");
   } else if (matches.length == 1) {
-    split = matches;
-    return split;
+    return matches;
   } else {
-    split = [num1.replace("−", "-"), symbol, num2.replace("−", "-")];
-    return split;
+    return [num1.replace("−", "-"), symbol, num2.replace("−", "-")];
   }
 }
 
@@ -157,38 +159,37 @@ function clearError() {
 
 function mathSymbol(symbol) {
   clearError();
-  // split = display1.value
-  //   .split(/^([−|\+|-]?\d+\.?\d+)([-−+×÷])([−|\+|-]?\d+\.?\d+)/)
-  //   .filter((part) => part !== "");
   split = splitExp(display1.value);
-  console.log(split);
   display1.value += symbol;
   display2.textContent += symbol;
-
   if (display1.value.includes("√")) {
-    clearError();
-    console.log(split);
     if (split.length > 1) {
-      splitOne = split[1].split("√");
-      splitValue = split.pop();
-      number2 = `${Math.sqrt(splitOne[1]).toFixed(3)}`;
+      split1 = display1.value.split(/[−|+|-|×|÷|√]/);
+      splitOne = split[2].split("√");
+      number2 = Math.sqrt(splitOne[1]);
       display1.value =
         roundOff2(operate(operator, +number1, +number2)) + symbol;
-      operator = symbol;
+      if (split1[1]) {
+        number2 = split1[1] * Math.sqrt(split1[2]);
+        display1.value =
+          roundOff2(operate(operator, +number1, +number2)) + symbol;
+      }
     } else if (split.length === 1) {
-      operator = symbol;
       splitOne = split[0].split("√");
-      display1.value = `${roundOff2(Math.sqrt(splitOne[1]))}${operator}`;
+      display1.value = `${roundOff2(Math.sqrt(splitOne[1]))}${symbol}`;
+      if (splitOne[0]) {
+        display1.value =
+          roundOff2(splitOne[0] * Math.sqrt(splitOne[1])) + symbol;
+      }
+    }
+  } else {
+    if (split.length > 1) {
+      display1.value = `${operate(operator, +number1, +number2)}${symbol}`;
     }
   }
-
-  if (split.length > 1) {
-    currentString = display1.value;
-    display1.value = splitExp(currentString);
-    console.log(operator);
-    console.log(split);
-    display1.value = `${operate(operator, +number1, +number2)}${symbol}`;
-  }
+  split = splitExp(display1.value);
+  number1 = split[0];
+  number2 = split[2];
   operator = symbol;
 }
 
@@ -212,20 +213,12 @@ function displayValues(digit) {
   clearError();
   display1.value += digit;
   display2.textContent += digit;
-  // split = display1.value
-  //   .split(/^([−|\+|-]?\d+\.?\d+)([-−+×÷])([−|\+|-]?\d+\.?\d+)/)
-  //   .filter((part) => part !== "");
   split = splitExp(display1.value);
-  console.log(split);
-  console.log(display1.value);
   if (split) {
     number1 = split[0];
     // operator = split[1];
     number2 = split[2];
   }
-  console.log(number1);
-  console.log(number2);
-  console.log(operator);
 }
 
 digitBtn1.addEventListener("click", () => {
@@ -296,78 +289,80 @@ pointBtn.addEventListener("click", () => {
 });
 
 equalsBtn.addEventListener("click", () => {
-  console.log(display1.value.split(operator));
+  clearError();
   console.log(split);
   if (display1.value.includes("√")) {
-    console.log("square root");
-    clearError();
     if (split.length > 1) {
-      split2 = split[1];
-      splitOne = split[1].split("√");
-      split.pop();
-      number2 = roundOff2(Math.sqrt(splitOne[1]));
-      display1.value = operate(operator, +split, +number2);
-      split.push(split2);
+      split1 = display1.value.split(/[−|+|-|×|÷|√]/);
+      splitOne = split[2].split("√");
+      number2 = Math.sqrt(splitOne[1]);
+      display1.value = roundOff2(operate(operator, +number1, +number2));
+      if (split1[1]) {
+        number2 = split1[1] * Math.sqrt(split1[2]);
+        display1.value = roundOff2(operate(operator, +number1, +number2));
+      }
     } else if (split.length === 1) {
       splitOne = split[0].split("√");
-      display1.value = roundOff2(Math.sqrt(splitOne[1]));
+      display1.value = `${roundOff2(Math.sqrt(splitOne[1]))}`;
+      if (splitOne[0]) {
+        display1.value = roundOff2(splitOne[0] * Math.sqrt(splitOne[1]));
+      }
+    }
+  } else {
+    if (number1 && number2 && split.length > 1) {
+      display1.value = display2.textContent = operate(
+        operator,
+        +number1,
+        +number2
+      );
+      split = splitExp(display1.value);
+      number1 = split[0];
+      number2 = split[2];
+    } else {
+      error = true;
+      display1.value = "Please Input a Valid Expression";
+      display2.textContent = "";
+      number1 = number1.replace("−", "-");
+      if (+number1) {
+        error = false;
+        display1.value = display2.textContent = number1;
+      }
     }
   }
-
-  console.log(display1.value);
-  console.log(operator);
-  number2 = split[2];
-
-  if (split.length > 1) {
-    console.log(split);
-    display1.value = "";
-    display1.value = splitExp(split);
-    display2.textContent = operate(operator, +number1, +number2);
-  } //else {
-  //   error = true;
-  //   display1.value = "Please Input a valid Expression";
-  //   display2.textContent = "";
-  // }
 });
 
 percentBtn.addEventListener("click", () => {
   clearError();
   display2.textContent += "%";
-  console.log(split);
   if (number1 && number2) {
-    split2 = split[1];
-    split.pop();
-    console.log(split);
     number2 = `${number2 / 100}`;
-    display1.value = split + operator + number2;
-    split.push(split2);
-  } else if (number1) {
-    console.log(split);
+    display1.value = number1 + operator + number2;
+  } else if (+number1) {
     display1.value = `${number1 / 100}`;
   }
+  split = splitExp(display1.value);
+  number1 = split[0];
+  number2 = split[2];
 });
 
 powerBtn.addEventListener("click", () => {
   clearError();
   display2.textContent += "²";
-  console.log(split);
   if (number1 && number2) {
-    split2 = split[1];
-    split.pop();
-    console.log(split);
     number2 = `${number2 * number2}`;
-    display1.value = split + operator + number2;
-    split.push(split2);
-  } else if (number1) {
-    console.log(split);
+    display1.value = number1 + operator + number2;
+  } else if (+number1) {
     display1.value = `${number1 * number1}`;
   }
+  split = splitExp(display1.value);
+  number1 = split[0];
+  number2 = split[2];
 });
 
 sqRootBtn.addEventListener("click", () => {
+  clearError();
   display1.value += "√";
   display2.textContent += "√";
-  // display1.value = Math.sqrt(number1).toFixed(3);
 });
 
 document.addEventListener("keydown", function (e) {
@@ -430,44 +425,3 @@ document.addEventListener("keydown", function (e) {
     clearBtn.click();
   }
 });
-
-// let num21 = 512123.32;
-
-// const roundedNum = Math.round(num21 * 100) / 100;
-
-// console.log(roundedNum);
-
-greet = "+23";
-feet = "34++646465";
-groot = "25×92";
-make = "7545464+1232";
-red = "−0.08*-121344439.6";
-// greet.replace("−", "-");
-// greetSplit1 = feet.split(/(\d+(\.\d+)?|\S)/g);
-// console.log(greetSplit1);
-// stringSplit = feet.split(/(?=[$-/:-?{-~!"^_`\[\]])([-|+|/|*])/gi);
-// console.log(stringSplit);
-// greetSplit = feet.split(/(?=[$-/:-?{-~!"^_`\[\]])([+|-]?\.?\d+)([-|+|/|*])/);
-// console.log(greetSplit);
-// stringSplit2 = make.split(/(?=[$-/:-?{-~!"^_`\[\]])/);
-// console.log(stringSplit2);
-// stringSplit4 = red
-//   .split(/([\+\-\*\/](\+|-)?\d+(\.\d+)?|\s)/)
-//   .filter((part) => part.trim() !== "");
-// console.log(stringSplit4);
-// split3 = groot
-//   .split(/^([−|\+|-]?\d+(\.\d+)?)([-−+×÷])([−|\+|-]?\d+(\.\d+)?)/)
-//   .filter((part) => part !== "");
-// console.log([split3[0], split3[2], split3[3]]);
-// const regex = /([−|+|-]?\d+(\.\d+)?)([-−+×*/÷])([−|+|-]?\d+(\.\d+)?)/;
-// // stringSplit3 = feet.match(regex);
-// // console.log(stringSplit3);
-// const exp = groot;
-// const matches = exp.split(regex);
-// console.log(matches);
-// console.log(greet.split(/\+\s*/));
-// if (matches) {
-//   const [, num1, , operator, num2] = matches;
-//   console.log([num1, operator, num2]);
-//   console.log(num1);
-// }
