@@ -27,6 +27,7 @@ h1 {
   color: cyan;
 }
 
+<<<<<<< HEAD
 .calculator {
   width: 300px;
   height: 500px;
@@ -35,6 +36,11 @@ h1 {
   display: flex;
   flex-direction: column;
   background-color: burlywood;
+=======
+#main-input{
+    border: none;
+    font-family: Impact;
+>>>>>>> 6b54d8c5eacc0475a897cee0f70ce8cba94fd3e2
 }
 
 .display1-div {
