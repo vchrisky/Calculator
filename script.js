@@ -31,6 +31,7 @@ function operate(operator, number1, number2) {
     return multiply(number1, number2);
   } else if (operator === "÷") {
     if (number2 == 0) {
+      infinity = true;
       return "To Infinity... and Beyond!";
     } else {
       return divide(number1, number2);
@@ -134,6 +135,8 @@ btnDiv6.appendChild(powerBtn);
 btnDiv6.appendChild(sqRootBtn);
 btnDiv6.appendChild(equalsBtn);
 
+// mainInput = document.querySelector("#main-input");
+
 function splitExp(string) {
   sqRootBtn.textContent = "√";
   const regex = /([−|+|-]?\d+(\.\d+)?)([-−+×÷])([−|+|-|√]?\d+(\.\d+)?)/;
@@ -149,11 +152,19 @@ function splitExp(string) {
 }
 
 error = false;
+infinity = false;
 
 function clearError() {
   if (error) {
     error = false;
     display1.value = "";
+    display1.classList.remove("main-input-error");
+  }
+  if (infinity) {
+    infinity = false;
+    display1.value = "";
+    display2.textContent = "";
+    display1.classList.remove("main-input-infinity");
   }
 }
 
@@ -185,6 +196,9 @@ function mathSymbol(symbol) {
   } else {
     if (split.length > 1) {
       display1.value = `${operate(operator, +number1, +number2)}${symbol}`;
+      if (infinity) {
+        display2.textContent = "Buzz Lightyear says...";
+      }
     }
   }
   split = splitExp(display1.value);
@@ -315,6 +329,10 @@ equalsBtn.addEventListener("click", () => {
         +number1,
         +number2
       );
+      if (infinity) {
+        display1.classList.add("main-input-infinity");
+        display2.textContent = "Buzz Lightyear says...";
+      }
       split = splitExp(display1.value);
       number1 = split[0];
       number2 = split[2];
@@ -323,6 +341,7 @@ equalsBtn.addEventListener("click", () => {
       display1.value = "Please Input a Valid Expression";
       display2.textContent = "";
       number1 = number1.replace("−", "-");
+      display1.classList.add("main-input-error");
       if (+number1) {
         error = false;
         display1.value = display2.textContent = number1;
