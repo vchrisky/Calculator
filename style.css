@@ -51,7 +51,7 @@ h1 {
 }
 
 #main-input {
-  border: none;
+  outline: none;
   font-family: digital-7-mono;
   background-color: khaki;
 }
